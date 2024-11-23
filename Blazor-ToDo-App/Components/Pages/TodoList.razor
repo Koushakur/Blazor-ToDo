@@ -1,0 +1,72 @@
+﻿@page "/todo"
+@rendermode InteractiveServer
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+@code {
+
+    private List<string> todoList = [];
+    private string newEntryValue = string.Empty;
+    private bool listChanged = false;
+
+    private void AddToList()
+    {
+        if (string.IsNullOrWhiteSpace(newEntryValue))
+            return;
+
+        todoList.Add(newEntryValue);
+        newEntryValue = "";
+        listChanged = true;
+    }
+
+    private void RemoveFromList(int index)
+    {
+        todoList.RemoveAt(index);
+        listChanged = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var listData = await localStorage.GetItemAsync<List<string>>("todoList");
+            if (listData != null && listData.Count() > 0)
+            {
+                todoList = listData;
+                StateHasChanged();
+            }
+        }
+
+        if (listChanged)
+        {
+            await localStorage.SetItemAsync("todoList", todoList);
+            listChanged = false;
+        }
+    }
+}
+@* End code *@
+
+
+<h3>Todo</h3>
+
+<form @onsubmit="AddToList" class="entryInput">
+    <input @bind="newEntryValue" placeholder="New entry" />
+    <button type="submit" class="addButton">+</button>
+</form>
+
+@if (todoList.Count() == 0)
+{
+    <p>Empty list</p>
+}
+else
+{
+    <ul class="todoList">
+        @for (int i = 0; i < todoList.Count(); i++)
+        {
+            var tIndex = i;
+            <li>
+                @todoList[i]
+                <button @onclick="() => RemoveFromList(tIndex)" class="removeButton">-</button>
+            </li>
+        }
+    </ul>
+}
