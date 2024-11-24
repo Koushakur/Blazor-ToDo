@@ -1,17 +1,16 @@
 ﻿@page "/todo"
 @rendermode InteractiveServer
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 @code {
-
     private List<string> todoList = [];
     private string newEntryValue = string.Empty;
     private bool listChanged = false;
 
     private void AddToList()
     {
-        if (string.IsNullOrWhiteSpace(newEntryValue))
-            return;
+        if (string.IsNullOrWhiteSpace(newEntryValue)) return;
 
         todoList.Add(newEntryValue);
         newEntryValue = "";
@@ -24,6 +23,11 @@
         listChanged = true;
     }
 
+    private async void OnEntryChange()
+    {
+        await sessionStorage.SetItemAsync<string>("entry", newEntryValue);
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -32,8 +36,11 @@
             if (listData != null && listData.Count() > 0)
             {
                 todoList = listData;
-                StateHasChanged();
             }
+
+            newEntryValue = await sessionStorage.GetItemAsync<string>("entry") ?? "";
+
+            StateHasChanged();
         }
 
         if (listChanged)
@@ -49,7 +56,7 @@
 <h3>Todo</h3>
 
 <form @onsubmit="AddToList" class="entryInput">
-    <input @bind="newEntryValue" placeholder="New entry" />
+    <input @bind="newEntryValue" @bind:after="OnEntryChange" placeholder="New entry" />
     <button type="submit" class="addButton">+</button>
 </form>
 
