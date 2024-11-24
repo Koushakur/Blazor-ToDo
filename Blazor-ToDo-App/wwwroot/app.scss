@@ -24,7 +24,7 @@
     }
 }
 
-.addButton, .removeButton {
+button {
     display: inline-flex;
     color: white;
     border-radius: 8px;
@@ -34,22 +34,22 @@
     &:hover {
         background-color: #258cfb;
     }
-}
 
-.addButton {
-    height: 25px;
-    width: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    &.addButton {
+        height: 25px;
+        width: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-.removeButton {
-    width: 20px;
-    height: 20px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    &.removeButton {
+        width: 20px;
+        height: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 input {

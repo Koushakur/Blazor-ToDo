@@ -3,6 +3,9 @@
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
+@using System.Text
+@inject IJSRuntime JS
+
 @code {
     private List<string> todoList = [];
     private string newEntryValue = string.Empty;
@@ -49,9 +52,19 @@
             listChanged = false;
         }
     }
+
+    private async Task DownloadToFile()
+    {
+        byte[] todoListBytes = Encoding.UTF8.GetBytes(string.Join(Environment.NewLine, todoList));
+
+        await JS.InvokeVoidAsync(
+            "downloadFileFromStream",
+            "ToDo List.txt",
+            new DotNetStreamReference(new MemoryStream(todoListBytes))
+        );
+    }
 }
 @* End code *@
-
 
 <h3>Todo</h3>
 
@@ -76,4 +89,6 @@ else
             </li>
         }
     </ul>
+
+    <button @onclick="DownloadToFile">Download</button>
 }

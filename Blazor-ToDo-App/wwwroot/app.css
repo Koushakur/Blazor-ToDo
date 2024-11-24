@@ -22,26 +22,24 @@
   content: "⚆";
 }
 
-.addButton, .removeButton {
+button {
   display: inline-flex;
   color: white;
   border-radius: 8px;
   background-color: #1b6ec2;
   justify-items: center;
 }
-.addButton:hover, .removeButton:hover {
+button:hover {
   background-color: #258cfb;
 }
-
-.addButton {
+button.addButton {
   height: 25px;
   width: 25px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
-.removeButton {
+button.removeButton {
   width: 20px;
   height: 20px;
   display: inline-flex;
