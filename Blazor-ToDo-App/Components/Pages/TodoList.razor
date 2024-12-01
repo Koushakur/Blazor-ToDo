@@ -1,71 +1,5 @@
 ﻿@page "/todo"
 @rendermode InteractiveServer
-@inject Blazored.LocalStorage.ILocalStorageService localStorage
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-
-@using System.Text
-@inject IJSRuntime JS
-
-@code {
-    private List<string> todoList = [];
-    private string newEntryValue = string.Empty;
-    private bool listChanged = false;
-
-    private void AddToList()
-    {
-        if (string.IsNullOrWhiteSpace(newEntryValue)) return;
-
-        todoList.Add(newEntryValue);
-        newEntryValue = "";
-        OnEntryChange();
-        listChanged = true;
-    }
-
-    private void RemoveFromList(int index)
-    {
-        todoList.RemoveAt(index);
-        listChanged = true;
-    }
-
-    private async void OnEntryChange()
-    {
-        await sessionStorage.SetItemAsync<string>("entry", newEntryValue);
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            var listData = await localStorage.GetItemAsync<List<string>>("todoList");
-            if (listData != null && listData.Count() > 0)
-            {
-                todoList = listData;
-            }
-
-            newEntryValue = await sessionStorage.GetItemAsync<string>("entry") ?? "";
-
-            StateHasChanged();
-        }
-
-        if (listChanged)
-        {
-            await localStorage.SetItemAsync("todoList", todoList);
-            listChanged = false;
-        }
-    }
-
-    private async Task DownloadToFile()
-    {
-        byte[] todoListBytes = Encoding.UTF8.GetBytes(string.Join(Environment.NewLine, todoList));
-
-        await JS.InvokeVoidAsync(
-            "downloadFileFromStream",
-            "ToDo List.txt",
-            new DotNetStreamReference(new MemoryStream(todoListBytes))
-        );
-    }
-}
-@* End code *@
 
 <h3>Todo</h3>
 
@@ -74,7 +8,11 @@
     <button type="submit" class="addButton">+</button>
 </form>
 
-@if (todoList.Count() == 0)
+@if (todoList == null)
+{
+    <p>Loading list...</p>
+}
+else if (todoList.Count() == 0)
 {
     <p>Empty list</p>
 }

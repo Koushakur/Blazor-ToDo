@@ -1,8 +1,11 @@
 using Blazor_ToDo_App.Components;
+using Blazor_ToDo_App.Data;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var connString = builder.Configuration.GetConnectionString("UserDB");
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -10,6 +13,10 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredSessionStorage();
+
+builder.Services.AddDbContextFactory<UsersContext>(
+    options => options.UseSqlite(connString)
+);
 
 var app = builder.Build();
 
